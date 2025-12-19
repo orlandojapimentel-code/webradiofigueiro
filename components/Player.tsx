@@ -19,7 +19,8 @@ const Player: React.FC = () => {
         if (!response.ok) return;
         const data = await response.json();
         if (data?.icestats?.source) {
-          const source = Array.isArray(data.icestats.source) ? data.icestats.source[0] : data.icestats.source;
+          const sources = data.icestats.source;
+          const source = Array.isArray(sources) ? sources[0] : sources;
           if (source?.title) {
             const parts = source.title.split(' - ');
             setMetadata({
@@ -28,7 +29,9 @@ const Player: React.FC = () => {
             });
           }
         }
-      } catch (e) { /* Silencioso */ }
+      } catch (e) {
+        console.error("Erro ao carregar metadados");
+      }
     };
     fetchMetadata();
     const interval = setInterval(fetchMetadata, 20000);
@@ -40,30 +43,27 @@ const Player: React.FC = () => {
 
     if (isPlaying) {
       audioRef.current.pause();
-      audioRef.current.removeAttribute('src');
+      audioRef.current.src = ""; // Limpa o buffer
       audioRef.current.load();
       setIsPlaying(false);
     } else {
       try {
         setIsLoading(true);
         setHasError(false);
-        const finalUrl = `${BASE_STREAM_URL}&nocache=${Date.now()}`;
+        
+        // Adiciona timestamp para evitar cache agressivo do navegador
+        const finalUrl = `${BASE_STREAM_URL}&t=${Date.now()}`;
         audioRef.current.src = finalUrl;
         audioRef.current.volume = volume / 100;
         
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            setIsPlaying(true);
-            setIsLoading(false);
-          }).catch(() => {
-            setHasError(true);
-            setIsLoading(false);
-          });
-        }
+        await audioRef.current.play();
+        setIsPlaying(true);
+        setIsLoading(false);
       } catch (error) {
+        console.error("Erro ao reproduzir áudio:", error);
         setHasError(true);
         setIsLoading(false);
+        setIsPlaying(false);
       }
     }
   };
@@ -76,12 +76,10 @@ const Player: React.FC = () => {
 
   return (
     <div className="p-8 md:p-10 rounded-[3rem] bg-slate-900/40 backdrop-blur-3xl border border-indigo-500/20 shadow-2xl relative overflow-hidden group">
-      <audio ref={audioRef} preload="none" />
+      <audio ref={audioRef} preload="none" crossOrigin="anonymous" />
       
-      {/* Glow Effect */}
       <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-[100px] transition-all duration-1000 ${isPlaying ? 'bg-indigo-600/30 opacity-100' : 'bg-transparent opacity-0'}`}></div>
       
-      {/* Disco Animado */}
       <div className="flex justify-center mb-10 relative z-10">
         <div className={`relative w-56 h-56 rounded-full border-[10px] border-slate-800/80 p-2 bg-slate-950 shadow-2xl transition-all duration-700 ${isPlaying ? 'scale-105 shadow-indigo-500/30' : 'scale-100'}`}>
           <div className={`w-full h-full rounded-full overflow-hidden transition-all duration-1000 ${isPlaying ? 'animate-spin-slow' : 'opacity-60 grayscale-[50%]'}`}>
@@ -93,7 +91,6 @@ const Player: React.FC = () => {
         </div>
       </div>
 
-      {/* Visualizer */}
       <div className="flex items-end justify-center gap-1.5 h-14 mb-8 relative z-10">
         {[...Array(20)].map((_, i) => (
           <div 
@@ -107,17 +104,15 @@ const Player: React.FC = () => {
         ))}
       </div>
 
-      {/* Informação da Música */}
       <div className="text-center mb-10 min-h-[5rem] relative z-10">
         <h3 className="text-xl font-black text-white mb-2 leading-tight line-clamp-2">
-          {hasError ? "Ligação Perdida" : metadata.title}
+          {hasError ? "Erro na Ligação" : metadata.title}
         </h3>
         <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] opacity-70">
-          {hasError ? "Tente novamente" : metadata.artist}
+          {hasError ? "Tente Recarregar" : metadata.artist}
         </p>
       </div>
 
-      {/* Controlos */}
       <div className="flex flex-col items-center gap-10 relative z-10">
         <button
           onClick={togglePlay}
