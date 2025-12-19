@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Player from './components/Player';
 import Schedule from './components/Schedule';
 import Socials from './components/Socials';

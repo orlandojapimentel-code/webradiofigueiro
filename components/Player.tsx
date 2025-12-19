@@ -2,6 +2,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const STREAM_URL = "https://rs2.ptservidor.com/proxy/orlando?mp=/stream?type=.mp3";
+// Nota: O endpoint de metadados pode variar dependendo da configuração do servidor Icecast/Shoutcast
+const METADATA_URL = "https://rs2.ptservidor.com/proxy/orlando?mp=/status-json.xsl";
 
 const Player: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -9,12 +11,41 @@ const Player: React.FC = () => {
   const [metadata, setMetadata] = useState({ artist: 'Web Rádio', title: 'Figueiró • Portugal' });
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const response = await fetch(METADATA_URL);
+        const data = await response.json();
+        // Ajuste conforme a estrutura específica do seu servidor
+        if (data && data.icestats && data.icestats.source) {
+          const source = Array.isArray(data.icestats.source) ? data.icestats.source[0] : data.icestats.source;
+          if (source.title) {
+            const parts = source.title.split(' - ');
+            setMetadata({
+              artist: parts[0] || 'Web Rádio Figueiró',
+              title: parts[1] || source.title
+            });
+          }
+        }
+      } catch (e) {
+        // Se falhar (por CORS ou formato), mantém o padrão
+        console.log("Metadata poll skipped or failed");
+      }
+    };
+
+    const interval = setInterval(fetchMetadata, 10000);
+    fetchMetadata();
+    return () => clearInterval(interval);
+  }, []);
+
   const togglePlay = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
+        // Recarregar a stream para evitar delay acumulado
         audioRef.current.src = STREAM_URL;
+        audioRef.current.load();
         audioRef.current.play().catch(e => console.error("Play error:", e));
       }
       setIsPlaying(!isPlaying);
@@ -31,13 +62,11 @@ const Player: React.FC = () => {
 
   return (
     <div className="p-10 rounded-[3rem] bg-slate-900/60 backdrop-blur-3xl border border-indigo-500/20 shadow-2xl overflow-hidden group">
-      <audio ref={audioRef} preload="none">
+      <audio ref={audioRef} preload="none" crossOrigin="anonymous">
         <source src={STREAM_URL} type="audio/mpeg" />
       </audio>
 
-      {/* Rotating Logo Container */}
       <div className="flex justify-center mb-10 relative">
-        {/* Outer Glow Ring */}
         <div className={`absolute inset-0 m-auto w-52 h-52 rounded-full blur-3xl transition-opacity duration-1000 ${isPlaying ? 'bg-indigo-500/20 opacity-100' : 'opacity-0'}`}></div>
         
         <div className={`relative w-48 h-48 rounded-full border-[6px] border-slate-800 p-1.5 bg-slate-950 shadow-[0_0_50px_rgba(79,70,229,0.2)] overflow-hidden transition-all duration-700 ${isPlaying ? 'scale-105' : 'scale-100'}`}>
@@ -46,6 +75,9 @@ const Player: React.FC = () => {
               src="./logo.png" 
               alt="Radio Logo" 
               className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=WRF';
+              }}
             />
           </div>
         </div>
@@ -53,13 +85,12 @@ const Player: React.FC = () => {
         {!isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="bg-indigo-600/30 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black text-white shadow-xl border border-indigo-500/50">
-              CLICK PLAY
+              OUVIR AGORA
             </div>
           </div>
         )}
       </div>
 
-      {/* Visualizer Animation */}
       <div className="flex items-end justify-center gap-1.5 h-16 mb-8 px-4">
         {[...Array(16)].map((_, i) => (
           <div
@@ -78,7 +109,9 @@ const Player: React.FC = () => {
       </div>
 
       <div className="text-center mb-10">
-        <h3 className="text-2xl font-black text-white tracking-tight mb-2 truncate">{metadata.title}</h3>
+        <h3 className="text-2xl font-black text-white tracking-tight mb-2 truncate px-2" title={metadata.title}>
+          {metadata.title}
+        </h3>
         <p className="text-indigo-400 text-sm font-bold uppercase tracking-[0.2em]">{metadata.artist}</p>
       </div>
 
@@ -125,7 +158,9 @@ const Player: React.FC = () => {
       <div className="mt-8 pt-8 border-t border-slate-800/50 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-950 rounded-full border border-slate-800">
            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-           <span className="text-[10px] text-slate-400 font-black tracking-widest uppercase">Streaming em Directo</span>
+           <span className="text-[10px] text-slate-400 font-black tracking-widest uppercase">
+            {isPlaying ? 'Em Direto' : 'Pronto para ouvir'}
+           </span>
         </div>
       </div>
     </div>
