@@ -10,13 +10,15 @@ import Contact from './components/Contact';
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#2e1065]">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 selection:bg-indigo-500/30">
       {/* Header / Logo */}
-      <header className="sticky top-0 z-50 glass-effect p-4 shadow-xl">
+      <header className="sticky top-0 z-50 glass-effect p-4 shadow-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4 group">
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500 shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
-              <img src="./logo.png" alt="Web Rádio Figueiró" className="w-full h-full object-cover" />
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500 shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300 bg-slate-800">
+              <img src="./logo.png" alt="Web Rádio Figueiró" className="w-full h-full object-cover" onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=WRF';
+              }} />
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-300">
@@ -98,20 +100,14 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 text-center space-y-6">
           <div className="flex justify-center gap-6 items-center">
              <div className="h-[1px] w-12 bg-slate-800"></div>
-             <img src="./logo.png" alt="Logo Footer" className="w-16 h-16 opacity-80" />
+             <img src="./logo.png" alt="Logo Footer" className="w-16 h-16 opacity-80" onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=WRF';
+              }} />
              <div className="h-[1px] w-12 bg-slate-800"></div>
           </div>
           <div className="space-y-2">
             <p className="text-slate-300 font-bold uppercase tracking-widest">Web Rádio Figueiró</p>
             <p className="text-slate-500 text-sm">Amarante • Portugal</p>
-          </div>
-          <div className="flex justify-center gap-8 text-slate-400 text-sm">
-             <a href="mailto:webradiofigueiro@gmail.com" className="hover:text-indigo-400 transition-colors flex items-center gap-2">
-               <i className="fas fa-envelope"></i> Email
-             </a>
-             <a href="tel:+351910270085" className="hover:text-indigo-400 transition-colors flex items-center gap-2">
-               <i className="fas fa-phone"></i> +351 910 270 085
-             </a>
           </div>
           <div className="pt-4">
             <p className="text-slate-600 text-xs">
