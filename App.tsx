@@ -10,7 +10,7 @@ import Contact from './components/Contact';
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#2e1065]">
       {/* Header / Logo */}
       <header className="sticky top-0 z-50 glass-effect p-4 shadow-xl">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
