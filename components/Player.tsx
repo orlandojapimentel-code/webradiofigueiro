@@ -12,7 +12,6 @@ const Player: React.FC = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Integração com o sistema do Telemóvel (Media Session)
   useEffect(() => {
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -26,12 +25,6 @@ const Player: React.FC = () => {
 
       navigator.mediaSession.setActionHandler('play', () => togglePlay());
       navigator.mediaSession.setActionHandler('pause', () => togglePlay());
-      navigator.mediaSession.setActionHandler('stop', () => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          setIsPlaying(false);
-        }
-      });
     }
   }, [metadata]);
 
@@ -69,7 +62,7 @@ const Player: React.FC = () => {
       audioRef.current.removeAttribute('src');
       audioRef.current.load();
       setIsPlaying(false);
-      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+      setIsLoading(false);
     } else {
       try {
         setIsLoading(true);
@@ -79,13 +72,11 @@ const Player: React.FC = () => {
         audioRef.current.volume = volume / 100;
         
         const playPromise = audioRef.current.play();
-        
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
               setIsPlaying(true);
               setIsLoading(false);
-              if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
             })
             .catch((error) => {
               console.error("Erro na reprodução:", error);
@@ -102,15 +93,16 @@ const Player: React.FC = () => {
     }
   };
 
-  // Função para recuperar de falhas de buffer (comum em telemóveis)
-  const handleStall = () => {
-    if (isPlaying && !isLoading) {
-      console.log("Stall detetado, a tentar recuperar...");
+  const handleAudioError = () => {
+    console.log("Erro detetado no áudio. A tentar reiniciar...");
+    if (isPlaying) {
       setIsLoading(true);
-      if (audioRef.current) {
-        audioRef.current.load();
-        audioRef.current.play().then(() => setIsLoading(false)).catch(() => {});
-      }
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.load();
+          audioRef.current.play().then(() => setIsLoading(false)).catch(() => setIsLoading(false));
+        }
+      }, 2000);
     }
   };
 
@@ -129,8 +121,9 @@ const Player: React.FC = () => {
         preload="none" 
         onWaiting={() => setIsLoading(true)}
         onPlaying={() => setIsLoading(false)}
-        onStalled={handleStall}
-        onSuspend={() => console.log("Sistema suspendeu áudio")}
+        onCanPlay={() => setIsLoading(false)}
+        onStalled={handleAudioError}
+        onError={handleAudioError}
       />
       
       <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-[100px] transition-all duration-1000 ${isPlaying ? 'bg-indigo-600/30 opacity-100' : 'bg-transparent opacity-0'}`}></div>
@@ -150,10 +143,10 @@ const Player: React.FC = () => {
         {[...Array(20)].map((_, i) => (
           <div 
             key={i} 
-            className={`w-1 rounded-full transition-all duration-300 ${isPlaying ? 'bg-indigo-500/80' : 'bg-slate-700/30'}`} 
+            className={`w-1 rounded-full transition-all ${isPlaying ? 'bg-indigo-500/80 animate-bar' : 'bg-slate-700/30 h-1'}`} 
             style={{ 
-              height: isPlaying ? `${20 + Math.random() * 80}%` : '4px', 
-              transitionDuration: isPlaying ? '150ms' : '300ms'
+              animationDelay: `${i * 0.05}s`,
+              animationDuration: `${0.5 + Math.random() * 0.5}s`
             }} 
           ></div>
         ))}
@@ -171,12 +164,12 @@ const Player: React.FC = () => {
       <div className="flex flex-col items-center gap-10 relative z-10">
         <button
           onClick={togglePlay}
-          disabled={isLoading}
+          disabled={isLoading && !isPlaying}
           className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl active:scale-95 ${
             isPlaying 
             ? 'bg-slate-800 text-indigo-400 border-2 border-indigo-500/40' 
             : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/40'
-          } ${isLoading ? 'opacity-50' : ''}`}
+          }`}
         >
           {isLoading ? (
             <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
