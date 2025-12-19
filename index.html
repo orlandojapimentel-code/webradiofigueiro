@@ -3,67 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web Rádio Figueiró | Amarante</title>
+  <title>Web Rádio Figueiró | Amarante - Portugal</title>
+  
+  <!-- SEO & Social Media -->
+  <meta name="description" content="A sua rádio online favorita em Amarante. Música, notícias e entretenimento 24h por dia.">
+  <meta property="og:title" content="Web Rádio Figueiró">
+  <meta property="og:description" content="Ouça em direto a Web Rádio Figueiró.">
+  <meta property="og:image" content="./logo.png">
+  
   <link rel="icon" type="image/png" href="./logo.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    @keyframes spin-slow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .animate-spin-slow {
-      animation: spin-slow 12s linear infinite;
-    }
-    .glass-effect {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    body {
-      background-color: #020617;
-      margin: 0;
-      color: white;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
-    /* Custom Range Slider */
-    input[type=range] {
-      -webkit-appearance: none;
-      background: transparent;
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 6px;
-      cursor: pointer;
-      background: rgba(30, 41, 59, 0.5);
-      border-radius: 999px;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      height: 18px;
-      width: 18px;
-      border-radius: 50%;
-      background: #6366f1;
-      cursor: pointer;
-      -webkit-appearance: none;
-      margin-top: -6px;
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
-      border: 2px solid white;
-    }
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #020617;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #312e81;
-    }
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-spin-slow { animation: spin-slow 12s linear infinite; }
+    .glass-effect { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    body { background-color: #020617; margin: 0; color: white; overflow-x: hidden; scroll-behavior: smooth; }
+    input[type=range] { -webkit-appearance: none; background: transparent; }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(30, 41, 59, 0.5); border-radius: 999px; }
+    input[type=range]::-webkit-slider-thumb { height: 18px; width: 18px; border-radius: 50%; background: #6366f1; cursor: pointer; -webkit-appearance: none; margin-top: -6px; border: 2px solid white; }
   </style>
 <script type="importmap">
 {
