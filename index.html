@@ -19,25 +19,27 @@
     .animate-spin-slow { animation: spin-slow 12s linear infinite; }
     
     @keyframes bar-jump {
-      0%, 100% { height: 10%; }
+      0%, 100% { height: 15%; }
       50% { height: 100%; }
     }
     .animate-bar { animation: bar-jump 0.8s ease-in-out infinite; }
 
     .glass-effect { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
     body { background-color: #020617; margin: 0; color: white; overflow-x: hidden; scroll-behavior: smooth; }
+    
     input[type=range] { -webkit-appearance: none; background: transparent; }
     input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(30, 41, 59, 0.5); border-radius: 999px; }
     input[type=range]::-webkit-slider-thumb { height: 18px; width: 18px; border-radius: 50%; background: #6366f1; cursor: pointer; -webkit-appearance: none; margin-top: -6px; border: 2px solid white; }
   </style>
+
 <script type="importmap">
 {
   "imports": {
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
-    "vite": "https://esm.sh/vite@^7.3.0",
     "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "vite": "https://esm.sh/vite@^7.3.0"
   }
 }
 </script>

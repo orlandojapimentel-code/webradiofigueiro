@@ -11,6 +11,7 @@ const Player: React.FC = () => {
   const [metadata, setMetadata] = useState({ artist: 'Web Rádio', title: 'Figueiró • Portugal' });
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const loadingTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if ('mediaSession' in navigator) {
@@ -18,11 +19,8 @@ const Player: React.FC = () => {
         title: metadata.title,
         artist: metadata.artist,
         album: 'Web Rádio Figueiró',
-        artwork: [
-          { src: './logo.png', sizes: '512x512', type: 'image/png' }
-        ]
+        artwork: [{ src: './logo.png', sizes: '512x512', type: 'image/png' }]
       });
-
       navigator.mediaSession.setActionHandler('play', () => togglePlay());
       navigator.mediaSession.setActionHandler('pause', () => togglePlay());
     }
@@ -46,11 +44,11 @@ const Player: React.FC = () => {
           }
         }
       } catch (e) {
-        console.error("Erro ao carregar metadados");
+        console.error("Erro metadados");
       }
     };
     fetchMetadata();
-    const interval = setInterval(fetchMetadata, 20000);
+    const interval = setInterval(fetchMetadata, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -63,6 +61,7 @@ const Player: React.FC = () => {
       audioRef.current.load();
       setIsPlaying(false);
       setIsLoading(false);
+      if (loadingTimeoutRef.current) window.clearTimeout(loadingTimeoutRef.current);
     } else {
       try {
         setIsLoading(true);
@@ -77,16 +76,22 @@ const Player: React.FC = () => {
             .then(() => {
               setIsPlaying(true);
               setIsLoading(false);
+              if (loadingTimeoutRef.current) window.clearTimeout(loadingTimeoutRef.current);
             })
             .catch((error) => {
-              console.error("Erro na reprodução:", error);
+              console.error("Erro play:", error);
               setHasError(true);
               setIsLoading(false);
               setIsPlaying(false);
             });
         }
+
+        // Timeout de segurança para o spinner
+        loadingTimeoutRef.current = window.setTimeout(() => {
+          setIsLoading(false);
+        }, 6000);
+
       } catch (error) {
-        console.error("Erro ao configurar áudio:", error);
         setHasError(true);
         setIsLoading(false);
       }
@@ -94,23 +99,14 @@ const Player: React.FC = () => {
   };
 
   const handleAudioError = () => {
-    console.log("Erro detetado no áudio. A tentar reiniciar...");
     if (isPlaying) {
       setIsLoading(true);
       setTimeout(() => {
-        if (audioRef.current) {
+        if (audioRef.current && isPlaying) {
           audioRef.current.load();
-          audioRef.current.play().then(() => setIsLoading(false)).catch(() => setIsLoading(false));
+          audioRef.current.play().catch(() => setIsLoading(false));
         }
-      }, 2000);
-    }
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value);
-    setVolume(val);
-    if (audioRef.current) {
-      audioRef.current.volume = val / 100;
+      }, 3000);
     }
   };
 
@@ -119,7 +115,7 @@ const Player: React.FC = () => {
       <audio 
         ref={audioRef} 
         preload="none" 
-        onWaiting={() => setIsLoading(true)}
+        onWaiting={() => isPlaying && setIsLoading(true)}
         onPlaying={() => setIsLoading(false)}
         onCanPlay={() => setIsLoading(false)}
         onStalled={handleAudioError}
@@ -143,28 +139,28 @@ const Player: React.FC = () => {
         {[...Array(20)].map((_, i) => (
           <div 
             key={i} 
-            className={`w-1 rounded-full transition-all ${isPlaying ? 'bg-indigo-500/80 animate-bar' : 'bg-slate-700/30 h-1'}`} 
+            className={`w-1 rounded-full transition-all duration-500 ${isPlaying ? 'bg-indigo-500/80 animate-bar' : 'bg-slate-700/30'}`} 
             style={{ 
               animationDelay: `${i * 0.05}s`,
-              animationDuration: `${0.5 + Math.random() * 0.5}s`
+              animationDuration: `${0.6 + (i % 5) * 0.15}s`,
+              height: isPlaying ? undefined : '4px'
             }} 
           ></div>
         ))}
       </div>
 
       <div className="text-center mb-10 min-h-[5rem] relative z-10">
-        <h3 className="text-xl font-black text-white mb-2 leading-tight line-clamp-2">
+        <h3 className="text-xl font-black text-white mb-2 leading-tight line-clamp-2 uppercase">
           {hasError ? "Emissão Indisponível" : metadata.title}
         </h3>
         <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] opacity-70">
-          {hasError ? "Erro de Conexão" : metadata.artist}
+          {hasError ? "Tente novamente" : metadata.artist}
         </p>
       </div>
 
       <div className="flex flex-col items-center gap-10 relative z-10">
         <button
           onClick={togglePlay}
-          disabled={isLoading && !isPlaying}
           className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl active:scale-95 ${
             isPlaying 
             ? 'bg-slate-800 text-indigo-400 border-2 border-indigo-500/40' 
@@ -187,7 +183,11 @@ const Player: React.FC = () => {
             min="0"
             max="100"
             value={volume}
-            onChange={handleVolumeChange}
+            onChange={(e) => {
+              const v = parseInt(e.target.value);
+              setVolume(v);
+              if (audioRef.current) audioRef.current.volume = v/100;
+            }}
             className="flex-grow cursor-pointer"
           />
           <i className="fas fa-volume-up text-slate-500"></i>
