@@ -12,6 +12,29 @@ const Player: React.FC = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Integração com o sistema do Telemóvel (Media Session)
+  useEffect(() => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: metadata.title,
+        artist: metadata.artist,
+        album: 'Web Rádio Figueiró',
+        artwork: [
+          { src: './logo.png', sizes: '512x512', type: 'image/png' }
+        ]
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => togglePlay());
+      navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+      navigator.mediaSession.setActionHandler('stop', () => {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          setIsPlaying(false);
+        }
+      });
+    }
+  }, [metadata]);
+
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
@@ -43,16 +66,15 @@ const Player: React.FC = () => {
 
     if (isPlaying) {
       audioRef.current.pause();
-      // Limpeza completa para libertar a ligação ao servidor
       audioRef.current.removeAttribute('src');
       audioRef.current.load();
       setIsPlaying(false);
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     } else {
       try {
         setIsLoading(true);
         setHasError(false);
         
-        // Usar o URL direto sem parâmetros extras que podem confundir o proxy
         audioRef.current.src = BASE_STREAM_URL;
         audioRef.current.volume = volume / 100;
         
@@ -63,6 +85,7 @@ const Player: React.FC = () => {
             .then(() => {
               setIsPlaying(true);
               setIsLoading(false);
+              if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
             })
             .catch((error) => {
               console.error("Erro na reprodução:", error);
@@ -79,6 +102,18 @@ const Player: React.FC = () => {
     }
   };
 
+  // Função para recuperar de falhas de buffer (comum em telemóveis)
+  const handleStall = () => {
+    if (isPlaying && !isLoading) {
+      console.log("Stall detetado, a tentar recuperar...");
+      setIsLoading(true);
+      if (audioRef.current) {
+        audioRef.current.load();
+        audioRef.current.play().then(() => setIsLoading(false)).catch(() => {});
+      }
+    }
+  };
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value);
     setVolume(val);
@@ -89,8 +124,14 @@ const Player: React.FC = () => {
 
   return (
     <div className="p-8 md:p-10 rounded-[3rem] bg-slate-900/40 backdrop-blur-3xl border border-indigo-500/20 shadow-2xl relative overflow-hidden group">
-      {/* O atributo crossOrigin foi removido para evitar bloqueios de CORS do servidor de rádio */}
-      <audio ref={audioRef} preload="none" />
+      <audio 
+        ref={audioRef} 
+        preload="none" 
+        onWaiting={() => setIsLoading(true)}
+        onPlaying={() => setIsLoading(false)}
+        onStalled={handleStall}
+        onSuspend={() => console.log("Sistema suspendeu áudio")}
+      />
       
       <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-[100px] transition-all duration-1000 ${isPlaying ? 'bg-indigo-600/30 opacity-100' : 'bg-transparent opacity-0'}`}></div>
       
