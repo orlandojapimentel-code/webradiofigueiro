@@ -43,7 +43,8 @@ const Player: React.FC = () => {
 
     if (isPlaying) {
       audioRef.current.pause();
-      audioRef.current.src = ""; // Limpa o buffer
+      // Limpeza completa para libertar a ligação ao servidor
+      audioRef.current.removeAttribute('src');
       audioRef.current.load();
       setIsPlaying(false);
     } else {
@@ -51,19 +52,29 @@ const Player: React.FC = () => {
         setIsLoading(true);
         setHasError(false);
         
-        // Adiciona timestamp para evitar cache agressivo do navegador
-        const finalUrl = `${BASE_STREAM_URL}&t=${Date.now()}`;
-        audioRef.current.src = finalUrl;
+        // Usar o URL direto sem parâmetros extras que podem confundir o proxy
+        audioRef.current.src = BASE_STREAM_URL;
         audioRef.current.volume = volume / 100;
         
-        await audioRef.current.play();
-        setIsPlaying(true);
-        setIsLoading(false);
+        const playPromise = audioRef.current.play();
+        
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+              setIsLoading(false);
+            })
+            .catch((error) => {
+              console.error("Erro na reprodução:", error);
+              setHasError(true);
+              setIsLoading(false);
+              setIsPlaying(false);
+            });
+        }
       } catch (error) {
-        console.error("Erro ao reproduzir áudio:", error);
+        console.error("Erro ao configurar áudio:", error);
         setHasError(true);
         setIsLoading(false);
-        setIsPlaying(false);
       }
     }
   };
@@ -71,12 +82,15 @@ const Player: React.FC = () => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value);
     setVolume(val);
-    if (audioRef.current) audioRef.current.volume = val / 100;
+    if (audioRef.current) {
+      audioRef.current.volume = val / 100;
+    }
   };
 
   return (
     <div className="p-8 md:p-10 rounded-[3rem] bg-slate-900/40 backdrop-blur-3xl border border-indigo-500/20 shadow-2xl relative overflow-hidden group">
-      <audio ref={audioRef} preload="none" crossOrigin="anonymous" />
+      {/* O atributo crossOrigin foi removido para evitar bloqueios de CORS do servidor de rádio */}
+      <audio ref={audioRef} preload="none" />
       
       <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-[100px] transition-all duration-1000 ${isPlaying ? 'bg-indigo-600/30 opacity-100' : 'bg-transparent opacity-0'}`}></div>
       
@@ -106,10 +120,10 @@ const Player: React.FC = () => {
 
       <div className="text-center mb-10 min-h-[5rem] relative z-10">
         <h3 className="text-xl font-black text-white mb-2 leading-tight line-clamp-2">
-          {hasError ? "Erro na Ligação" : metadata.title}
+          {hasError ? "Emissão Indisponível" : metadata.title}
         </h3>
         <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] opacity-70">
-          {hasError ? "Tente Recarregar" : metadata.artist}
+          {hasError ? "Erro de Conexão" : metadata.artist}
         </p>
       </div>
 
