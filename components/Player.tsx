@@ -12,6 +12,10 @@ const Player: React.FC = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const loadingTimeoutRef = useRef<number | null>(null);
+  const recoveryTimeoutRef = useRef<number | null>(null);
+
+  // Função para gerar URL com cache-buster (evita dados "congelados")
+  const getStreamUrl = () => `${BASE_STREAM_URL}&nocache=${Date.now()}`;
 
   useEffect(() => {
     if ('mediaSession' in navigator) {
@@ -57,17 +61,21 @@ const Player: React.FC = () => {
 
     if (isPlaying) {
       audioRef.current.pause();
-      audioRef.current.removeAttribute('src');
+      audioRef.current.src = ""; 
       audioRef.current.load();
       setIsPlaying(false);
       setIsLoading(false);
+      setHasError(false);
       if (loadingTimeoutRef.current) window.clearTimeout(loadingTimeoutRef.current);
+      if (recoveryTimeoutRef.current) window.clearTimeout(recoveryTimeoutRef.current);
     } else {
       try {
         setIsLoading(true);
         setHasError(false);
         
-        audioRef.current.src = BASE_STREAM_URL;
+        // Atribuição de URL fresco com timestamp
+        audioRef.current.src = getStreamUrl();
+        audioRef.current.load(); 
         audioRef.current.volume = volume / 100;
         
         const playPromise = audioRef.current.play();
@@ -76,20 +84,19 @@ const Player: React.FC = () => {
             .then(() => {
               setIsPlaying(true);
               setIsLoading(false);
-              if (loadingTimeoutRef.current) window.clearTimeout(loadingTimeoutRef.current);
+              setHasError(false);
             })
             .catch((error) => {
-              console.error("Erro play:", error);
+              console.error("Erro Play:", error);
               setHasError(true);
               setIsLoading(false);
               setIsPlaying(false);
             });
         }
 
-        // Timeout de segurança para o spinner
         loadingTimeoutRef.current = window.setTimeout(() => {
           setIsLoading(false);
-        }, 6000);
+        }, 8000);
 
       } catch (error) {
         setHasError(true);
@@ -98,15 +105,21 @@ const Player: React.FC = () => {
     }
   };
 
-  const handleAudioError = () => {
-    if (isPlaying) {
-      setIsLoading(true);
-      setTimeout(() => {
+  const recoverStream = () => {
+    if (isPlaying && audioRef.current) {
+      console.log("A recuperar stream...");
+      if (recoveryTimeoutRef.current) window.clearTimeout(recoveryTimeoutRef.current);
+      
+      // Recuperação ultra-rápida (300ms) para não se notar o silêncio
+      recoveryTimeoutRef.current = window.setTimeout(() => {
         if (audioRef.current && isPlaying) {
+          audioRef.current.src = getStreamUrl();
           audioRef.current.load();
-          audioRef.current.play().catch(() => setIsLoading(false));
+          audioRef.current.play().catch(() => {
+            console.log("Nova tentativa falhou, aguardando...");
+          });
         }
-      }, 3000);
+      }, 300); 
     }
   };
 
@@ -114,12 +127,14 @@ const Player: React.FC = () => {
     <div className="p-8 md:p-10 rounded-[3rem] bg-slate-900/40 backdrop-blur-3xl border border-indigo-500/20 shadow-2xl relative overflow-hidden group">
       <audio 
         ref={audioRef} 
-        preload="none" 
+        preload="auto" 
         onWaiting={() => isPlaying && setIsLoading(true)}
-        onPlaying={() => setIsLoading(false)}
-        onCanPlay={() => setIsLoading(false)}
-        onStalled={handleAudioError}
-        onError={handleAudioError}
+        onPlaying={() => {
+          setIsLoading(false);
+          setHasError(false);
+        }}
+        onStalled={recoverStream}
+        onError={recoverStream}
       />
       
       <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-[100px] transition-all duration-1000 ${isPlaying ? 'bg-indigo-600/30 opacity-100' : 'bg-transparent opacity-0'}`}></div>
@@ -154,7 +169,7 @@ const Player: React.FC = () => {
           {hasError ? "Emissão Indisponível" : metadata.title}
         </h3>
         <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] opacity-70">
-          {hasError ? "Tente novamente" : metadata.artist}
+          {hasError ? "A tentar ligar..." : metadata.artist}
         </p>
       </div>
 
