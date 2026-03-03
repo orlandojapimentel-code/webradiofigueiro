@@ -37,6 +37,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      setTimeout(() => {
+        const root = document.getElementById('root');
+        if (root && root.innerHTML === '') {
+          console.warn('App failed to mount within 5 seconds. Checking for errors...');
+        }
+      }, 5000);
+    </script>
   </body>
 </html>
 
