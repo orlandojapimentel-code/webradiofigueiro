@@ -9,10 +9,12 @@ let memoryVisits = 10160;
 
 // Async Initialization for Database
 async function initDatabase() {
-  // Only try to use SQLite if NOT on Vercel
-  if (!process.env.VERCEL) {
+  // Only try to use SQLite if NOT on Vercel and in dev
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     try {
-      const Database = (await import("better-sqlite3")).default;
+      // Use a dynamic string to prevent Vercel from trying to bundle better-sqlite3
+      const sqliteModule = "better-sqlite3";
+      const Database = (await import(sqliteModule)).default;
       db = new Database(path.join(process.cwd(), "radio.db"));
       db.exec(`CREATE TABLE IF NOT EXISTS stats (id TEXT PRIMARY KEY, value INTEGER)`);
       db.prepare("INSERT OR IGNORE INTO stats (id, value) VALUES (?, ?)").run("visits", 10160);
