@@ -51,7 +51,7 @@ export default function App() {
           title: "Web Rádio Figueiró lança novo assistente de IA para ouvintes", 
           source: "WRF News", 
           time: "Há 5 horas",
-          link: "https://www.webradiofigueiro.pt"
+          link: "https://news.google.com/search?q=Web+Rádio+Figueiró+IA+assistente"
         },
         { 
           title: "Previsão do tempo: Sol regressa à região norte", 
@@ -179,6 +179,54 @@ export default function App() {
 
                 {/* AI Assistant */}
                 <AIService />
+
+                {/* Song Request Form */}
+                <section id="request-form" className="glass p-8 rounded-3xl shadow-xl border-2 border-radio-primary/10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 bg-radio-primary/20 rounded-2xl text-radio-primary">
+                      <Music size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold">Pedir uma Música</h3>
+                      <p className="text-zinc-500 text-sm">O teu pedido direto para a nossa emissão</p>
+                    </div>
+                  </div>
+                  
+                  <form className="cc_request_form grid grid-cols-1 md:grid-cols-2 gap-6" data-username="orlando">
+                    <div data-type="result" className="md:col-span-2 text-sm font-bold text-radio-primary mb-2"></div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase font-black text-zinc-400 tracking-widest">Artista</label>
+                      <input type="text" name="request[artist]" placeholder="Ex: Roberto Carlos" className="w-full p-4 bg-zinc-50 dark:bg-zinc-800 border-2 border-transparent focus:border-radio-primary rounded-2xl outline-none transition-all" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase font-black text-zinc-400 tracking-widest">Música</label>
+                      <input type="text" name="request[title]" placeholder="Ex: Emoções" className="w-full p-4 bg-zinc-50 dark:bg-zinc-800 border-2 border-transparent focus:border-radio-primary rounded-2xl outline-none transition-all" />
+                    </div>
+                    
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-xs uppercase font-black text-zinc-400 tracking-widest">Dedicatória</label>
+                      <textarea name="request[dedication]" placeholder="Para quem é esta música?" className="w-full p-4 bg-zinc-50 dark:bg-zinc-800 border-2 border-transparent focus:border-radio-primary rounded-2xl outline-none transition-all h-24 resize-none" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase font-black text-zinc-400 tracking-widest">O Teu Nome</label>
+                      <input type="text" name="request[sender]" className="w-full p-4 bg-zinc-50 dark:bg-zinc-800 border-2 border-transparent focus:border-radio-primary rounded-2xl outline-none transition-all" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase font-black text-zinc-400 tracking-widest">O Teu E-Mail</label>
+                      <input type="text" name="request[email]" className="w-full p-4 bg-zinc-50 dark:bg-zinc-800 border-2 border-transparent focus:border-radio-primary rounded-2xl outline-none transition-all" />
+                    </div>
+                    
+                    <div className="md:col-span-2 pt-4">
+                      <button type="button" data-type="submit" className="w-full py-4 bg-radio-primary text-white rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-radio-primary/20">
+                        Submeter Pedido à Emissão
+                      </button>
+                    </div>
+                  </form>
+                </section>
 
                 {/* Programming */}
                 <section id="programming" className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -385,123 +433,111 @@ export default function App() {
               Carregando ...
             </div>
           </div>
+        </aside>
+      </main>
 
-          {/* Song Request Form */}
-          <div id="request-form" className="glass p-6 rounded-3xl shadow-lg border-2 border-transparent focus-within:border-radio-primary/30 transition-colors">
-            <h3 className="font-bold mb-4 flex items-center gap-2 text-radio-primary">
-              <Music size={18} /> Pedir uma Música
-            </h3>
-            <form className="cc_request_form space-y-3" data-username="orlando">
-              <div data-type="result" className="text-xs font-bold text-radio-primary mb-2"></div>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-zinc-500">Artista</label>
-                <input type="text" name="request[artist]" className="w-full p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm" />
+      {/* Utility Grid Section */}
+      <section className="max-w-7xl mx-auto px-4 py-12 border-t border-zinc-200 dark:border-zinc-800">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Quick Actions & Contact */}
+          <div className="space-y-6">
+            <div className="glass p-6 rounded-3xl shadow-lg h-full">
+              <h3 className="font-bold mb-6 flex items-center gap-2 text-radio-primary">
+                <MapPin size={18} /> Informações Úteis
+              </h3>
+              <div className="space-y-4">
+                <a 
+                  href="https://www.viralagenda.com/pt/p/municipiodeamarante" 
+                  target="_blank"
+                  className="flex items-center justify-center w-full p-4 bg-zinc-900 text-white rounded-2xl font-bold hover:bg-zinc-800 transition-all shadow-lg hover:scale-[1.02]"
+                >
+                  Agenda Cultural
+                </a>
+                <a 
+                  href="https://www.farmaciasdeservico.net/mapa/3719" 
+                  target="_blank"
+                  className="flex items-center justify-center w-full p-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-lg hover:scale-[1.02]"
+                >
+                  Farmácias de Serviço
+                </a>
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-zinc-500">Música</label>
-                <input type="text" name="request[title]" className="w-full p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-zinc-500">Dedicado para</label>
-                <input type="text" name="request[dedication]" className="w-full p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-zinc-500">Seu nome</label>
-                <input type="text" name="request[sender]" className="w-full p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-zinc-500">Seu E-Mail</label>
-                <input type="text" name="request[email]" className="w-full p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm" />
-              </div>
-              <button type="button" data-type="submit" className="w-full py-3 bg-radio-primary text-white rounded-xl font-bold text-sm hover:scale-105 transition-transform shadow-lg">
-                Submeter pedido
-              </button>
-            </form>
-          </div>
 
-          {/* Quick Actions */}
-          <div className="space-y-4">
-            <a 
-              href="https://www.viralagenda.com/pt/p/municipiodeamarante" 
-              target="_blank"
-              className="block w-full p-4 bg-zinc-900 text-white rounded-2xl font-bold text-center hover:bg-zinc-800 transition-colors shadow-lg"
-            >
-              Agenda Cultural
-            </a>
-            <a 
-              href="https://www.farmaciasdeservico.net/mapa/3719" 
-              target="_blank"
-              className="block w-full p-4 bg-emerald-600 text-white rounded-2xl font-bold text-center hover:bg-emerald-700 transition-colors shadow-lg"
-            >
-              Farmácias de Serviço
-            </a>
+              <div className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+                <h4 className="font-bold mb-4 text-sm uppercase tracking-wider text-zinc-500">Contactos Diretos</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Mail size={16} className="text-radio-primary" />
+                    <a href={`mailto:${RADIO_EMAIL}`} className="hover:underline font-medium">{RADIO_EMAIL}</a>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Phone size={16} className="text-radio-primary" />
+                    <span className="font-medium">{RADIO_PHONE}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <MessageCircle size={16} className="text-green-500" />
+                    <a href={`https://wa.me/351910270085`} target="_blank" className="hover:underline font-medium">WhatsApp Estúdio</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Partnerships */}
-          <div className="glass p-6 rounded-3xl shadow-lg border-2 border-radio-primary/20">
-            <h3 className="font-bold mb-4">Parcerias WRF</h3>
-            <div className="space-y-4">
-              {PARTNERS.map((partner, i) => (
-                <a key={i} href={partner.url} target="_blank" className="block p-4 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden">
-                  <div className="h-20 mb-3 flex items-center justify-center bg-zinc-50 dark:bg-zinc-900/50 rounded-xl">
-                    <img 
-                      src={partner.image} 
-                      alt={partner.name} 
-                      className="max-h-full max-w-full object-contain" 
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        const initials = partner.name.includes("FM") ? "FM" : partner.name;
-                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=f27d26&color=fff&bold=true&length=2`;
-                      }}
-                    />
-                  </div>
-                  <p className="text-lg font-bold text-radio-primary leading-tight mb-1">{partner.name}</p>
-                  <p className="text-xs text-zinc-500">Visita o nosso site oficial para mais informações.</p>
-                </a>
-              ))}
-              <div className="p-4 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl text-center">
-                <p className="text-sm font-medium mb-2">Queres ser parceiro?</p>
+          <div className="lg:col-span-2">
+            <div className="glass p-8 rounded-3xl shadow-lg border-2 border-radio-primary/10 h-full">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="font-bold text-2xl flex items-center gap-2">
+                  <Sparkles className="text-radio-primary" /> Parcerias Web Rádio Figueiró
+                </h3>
                 <button 
                   onClick={() => window.open(`mailto:${RADIO_EMAIL}?subject=Parceria WRF`)}
-                  className="px-4 py-2 bg-radio-primary text-white rounded-xl text-xs font-bold hover:scale-105 transition-transform"
+                  className="px-6 py-2 bg-radio-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md"
                 >
-                  Saber Mais
+                  Ser Parceiro
                 </button>
               </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {PARTNERS.map((partner, i) => (
+                  <a key={i} href={partner.url} target="_blank" className="group block p-6 bg-white dark:bg-zinc-800/50 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-zinc-100 dark:border-zinc-700">
+                    <div className="h-24 mb-4 flex items-center justify-center bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl group-hover:bg-white dark:group-hover:bg-zinc-800 transition-colors">
+                      <img 
+                        src={partner.image} 
+                        alt={partner.name} 
+                        className="max-h-full max-w-full object-contain p-2" 
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          const initials = partner.name.includes("FM") ? "FM" : partner.name;
+                          (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=f27d26&color=fff&bold=true&length=2`;
+                        }}
+                      />
+                    </div>
+                    <p className="text-xl font-black text-radio-primary mb-2">{partner.name}</p>
+                    <p className="text-sm text-zinc-500 leading-relaxed">Parceiro oficial da Web Rádio Figueiró. Visite o site para conhecer todos os serviços e ofertas exclusivas.</p>
+                    <div className="mt-4 flex items-center gap-2 text-xs font-bold text-radio-primary group-hover:translate-x-2 transition-transform">
+                      VISITAR SITE <ExternalLink size={12} />
+                    </div>
+                  </a>
+                ))}
+                
+                <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl text-center bg-zinc-50/30 dark:bg-zinc-900/10">
+                  <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 text-zinc-400">
+                    <Users size={24} />
+                  </div>
+                  <p className="text-sm font-bold mb-1">O Teu Espaço Aqui</p>
+                  <p className="text-xs text-zinc-500 mb-4">Promove o teu negócio na rádio que mais cresce na região.</p>
+                  <button 
+                    onClick={() => window.open(`mailto:${RADIO_EMAIL}?subject=Parceria WRF`)}
+                    className="text-xs font-black text-radio-primary hover:underline"
+                  >
+                    CONTACTAR AGORA →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Contact */}
-          <div className="glass p-6 rounded-3xl shadow-lg">
-            <h3 className="font-bold mb-4">Contactos</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm">
-                <Mail size={16} className="text-radio-primary" />
-                <a href={`mailto:${RADIO_EMAIL}`} className="hover:underline">{RADIO_EMAIL}</a>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Phone size={16} className="text-radio-primary" />
-                <span>{RADIO_PHONE}</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <MessageCircle size={16} className="text-green-500" />
-                <a href={`https://wa.me/351910270085`} target="_blank" className="hover:underline">WhatsApp Estúdio</a>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <MapPin size={16} className="text-radio-primary" />
-                <span>Figueiró, Amarante, Portugal</span>
-              </div>
-            </div>
-            <button 
-              onClick={() => window.open(`mailto:${RADIO_EMAIL}`)}
-              className="w-full mt-6 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl text-sm font-bold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-            >
-              Enviar Email
-            </button>
-          </div>
-
-        </aside>
-      </main>
+        </div>
+      </section>
 
       {/* Fixed Player */}
       <Player />
