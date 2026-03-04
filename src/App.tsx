@@ -95,16 +95,16 @@ export default function App() {
             <h1 className="text-xl font-bold tracking-tight hidden sm:block">Web Rádio Figueiró</h1>
           </div>
 
-          <nav className="flex items-center gap-4 md:gap-6">
+          <nav className="flex items-center gap-2 md:gap-4 bg-zinc-100 dark:bg-zinc-800/50 p-1 rounded-2xl">
             <button 
               onClick={() => setActiveTab('home')}
-              className={`text-xs md:text-sm font-bold transition-colors ${activeTab === 'home' ? 'text-radio-primary' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+              className={`px-4 py-2 text-xs md:text-sm font-bold rounded-xl transition-all ${activeTab === 'home' ? 'bg-radio-primary text-white shadow-md scale-105' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
             >
               Início
             </button>
             <button 
               onClick={() => setActiveTab('media')}
-              className={`text-xs md:text-sm font-bold transition-colors ${activeTab === 'media' ? 'text-radio-primary' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+              className={`px-4 py-2 text-xs md:text-sm font-bold rounded-xl transition-all ${activeTab === 'media' ? 'bg-radio-primary text-white shadow-md scale-105' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
             >
               Explorar Media
             </button>
@@ -450,7 +450,8 @@ export default function App() {
                       className="max-h-full max-w-full object-contain" 
                       referrerPolicy="no-referrer"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.name)}&background=f27d26&color=fff`;
+                        const initials = partner.name.includes("FM") ? "FM" : partner.name;
+                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=f27d26&color=fff&bold=true&length=2`;
                       }}
                     />
                   </div>

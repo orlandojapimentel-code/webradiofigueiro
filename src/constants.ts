@@ -12,7 +12,7 @@ export const SOCIAL_LINKS = {
 
 export const PARTNERS = [
   {
-    name: "FM - Rent a car & Bicycle House",
+    name: "FM Rent a car & Bicycle House",
     url: "https://fm-bicycle.pt/",
     image: "/parceiro_fm.png",
   }
